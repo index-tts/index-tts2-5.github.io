@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndexTTS 2.5 Technical Report</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="cb987c55-28cc-450b-adee-a200240623f6"></script>
+</head>
+<body>
+
+    <!-- Page 0 -->
+    <section class="container" id="section0">
+        <h1>IndexTTS 2.5 Technical Report</h1>
+        <div class="author">
+            <p>Index SpeechTeam</p>
+        </div>
+
+        <!-- paper -->
+        <section class="paper-section">
+            <h2>Abstract</h2>
+            <p class="paper-description">
+                In prior work, we introduced IndexTTS 2, a zero-shot neural text-to-speech foundation model comprising two core components: a transformer-based Text-to-Semantic (T2S) module and a non-autoregressive Semantic-to-Mel (S2M) module, which together enable faithful emotion replication and establish the first autoregressive duration-controllable generative paradigm. Building upon this, we present IndexTTS 2.5, which significantly enhances multilingual coverage, inference speed, and overall synthesis quality through four key improvements:
+                <ul>
+                    <li><strong>Semantic Codec Compression:</strong> we reduce the semantic codec frame rate from 50 Hz to 25 Hz, halving sequence length and substantially lowering both training and inference costs;</li>
+                    <li><strong>Architectural Upgrade:</strong> we replace the U-DiT-based backbone of the S2M module with a more efficient Zipformer-based modeling architecture, achieving notable parameter reduction and faster mel-spectrogram generation;</li>
+                    <li><strong>Multilingual Extension:</strong> We propose three explicit cross-lingual modeling strategies, boundary-aware alignment, token-level concatenation, and instruction-guided generation, establishing practical design principles for zero-shot multilingual emotional TTS that supports Chinese, English, Japanese, and Spanish, and enables robust emotion transfer even without target-language emotional training data;</li>
+                    <li><strong>Reinforcement Learning Optimization:</strong> we apply Group Relative Policy Optimization (GRPO) in post-training of the T2S module, improving pronunciation accuracy and naturalness.</li>
+                </ul>
+                Experiments show that IndexTTS 2.5 not only supports broader language coverage but also replicates emotional prosody in unseen languages under the same zero-shot setting. IndexTTS 2.5 achieves a 2.28× improvement in real-time factor (RTF) while maintaining comparable word error rate (WER) and speaker similarity to IndexTTS 2.
+            </p>
+        </section>
+
+
+        <!-- contents -->
+        <h2>Contents</h2>
+        <ul>
+            <li><a href="#section1">1 Emotionally Expressive Speech Generation</a></li>
+
+            <li><a href="#section2">2 Zero-shot In-context Generation</a></li>
+        </ul>
+    </section>
+
+    <!-- Demo Section -->
+
+    <!-- page 1 -->
+    <section class="container" id="section1">
+        <h2>1 Emotionally Expressive Speech Generation</h2>
+
+        <h4>IndexTTS 2.5 accurately reconstructs the emotional content present in the prompt audio, demonstrating emotion replication in Japanese and Spanish—languages newly supported in this version.</h4>
+        <div class="demo-section">
+            <div class="table-container">
+                <table class="zebra-table" id="section1-table">
+                    <tr>
+                        <th>Language</th>
+                        <th>Emotion</th>
+                        <th>Audio-Prompt</th>
+                        <th style="min-width:200px;">Text</th>
+                        <th>Audio</th>
+                    </tr>
+
+<!-- TODO  mark-->
+                    <tr>
+                        <td rowspan="4">JA</th>
+                        <td>Happy</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja/happy_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>ちょうど探しに行こうかなって思っていたんだ。どうかな、一緒に練習でも。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja/happy_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Neutral</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja/neutral_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>小さい頃、異邦から流れ着いた勇者が剣術修行に付き合ってくれたり、魔物を倒しながら一緒に世界を救う旅をしたり…なんてのをよく想像していたんだ。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja/neutral_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Guilty</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja/guilty_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>いつ咲こうとも、風に吹き落される時は…来る。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja/guilty_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Sad</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja/sad_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>いつ咲こうとも、風に吹き落される時は…来る。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja/sad_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+<!-- TODO  mark-->
+
+                    <tr>
+                        <td rowspan="4">ES</th>
+                        <td>Happy</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es/happy_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>No esperaba que esto fuese tan útil. Ahora que has obtenido un ascenso. ¿Puedes mejorar mi habitación? Gracias por valorar alguien tan vulnerable como yo, Doc. Seguiré dando lo mejor de mí.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es/happy_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Excited</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es/excited_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>¿Te has perdido? No te preocupes. Dime adónde quieres ir. Para llegar allí, sube a las escaleras de la izquierda del cuarto piso. Luego, gira a la derecha, y traspasa la tercera cruce, vea a la izquierda. Baja el piso, y sigue atravesar a la izquierda. Está justo enfrente de la sala de ingeniería de número tres.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es/excited_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Surprise</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es/surprise_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>No es tu dieta de hacer los bajos de tu ropa y tus zapatos están limpios. ¡Muy bien! Espera, llevas el cuello de la ropa muy arrugado. No pretenderás ir a la fiesta así, ¿no? Vuelve y arregla eso. Te espero aquí.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es/surprise_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Neutral</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es/neutral_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>Ehh, ¿me das un momento para asimilarlo? Supongo que ya es tarde para echarse atrás. Vamos allá.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es/neutral_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- page 2 -->
+    <section class="container" id="section2">
+        <h2>2 Zero-shot In-context Generation</h2>
+        <h4>IndexTTS 2.5 supports zero-shot voice cloning in Chinese, English, Japanese, and Spanish, preserving speaker identity from a single reference audio. All samples use neutral prosody.</h4>
+        <div class="demo-section">
+            <div class="table-container">
+                <table class="zebra-table">
+                    <tr>
+                        <th>Language</th>
+                        <th>Audio-Prompt</th>
+                        <th style="min-width:200px;">Text</th>
+                        <th>Ground Truth</th>
+                        <th>Model</th>
+                        <th>Audio</th>
+                    </tr>
+
+<!-- TODO  mark-->
+                    <tr>
+                        <td rowspan="4">ZH</th>
+                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="4">为了弄明白停水原因，他给自来水公司打电话。</td>
+                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/zh_348/gt.aac" type="audio/aac"></audio></div></td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>IndexTTS 2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_indextts_2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FireRedTTS-2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_firered_tts_2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+<!-- TODO  mark-->
+                    <tr>
+                        <td rowspan="4">EN</th>
+                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/en_338/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="4">Kanwal is said to mean 'snakes indeed' in a local aboriginal language.</td>
+                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/en_338/gt.aac" type="audio/aac"></audio></div></td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en_338/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>IndexTTS 2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en_338/audio_indextts_2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en_338/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FireRedTTS-2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en_338/audio_firered_tts_2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+<!-- TODO  mark-->
+                    <tr>
+                        <td rowspan="4">JA</th>
+                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/ja_390/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="4">そのため、単にラベルとして表記が追加されがちです。</td>
+                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/ja_390/gt.aac" type="audio/aac"></audio></div></td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja_390/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>IndexTTS 2</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja_390/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FireRedTTS-2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja_390/audio_firered_tts_2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+<!-- TODO  mark-->
+                    <tr>
+                        <td rowspan="4">ES</th>
+                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/es_613/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="4">A medida que el dominio del idioma griego fue decayendo, Occidente se distanció de sus raíces griegas tanto filosóficas como científicas.</td>
+                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/es_613/gt.aac" type="audio/aac"></audio></div></td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es_613/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>IndexTTS 2</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es_613/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FireRedTTS-2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es_613/audio_firered_tts_2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+
+
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2025 May, Index SpeechTeam. All rights reserved.</p>
+    </div>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const tables = document.querySelectorAll(".zebra-table");
+            tables.forEach(table => {
+                logicalTableStyle(table);
+            });
+        });
+    </script>
+</body>
+</html>
