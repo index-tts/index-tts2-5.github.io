@@ -25,7 +25,7 @@
                 <ul>
                     <li><strong>Semantic Codec Compression:</strong> we reduce the semantic codec frame rate from 50 Hz to 25 Hz, halving sequence length and substantially lowering both training and inference costs;</li>
                     <li><strong>Architectural Upgrade:</strong> we replace the U-DiT-based backbone of the S2M module with a more efficient Zipformer-based modeling architecture, achieving notable parameter reduction and faster mel-spectrogram generation;</li>
-                    <li><strong>Multilingual Extension:</strong> We propose three explicit cross-lingual modeling strategies, boundary-aware alignment, token-level concatenation, and instruction-guided generation, establishing practical design principles for zero-shot multilingual emotional TTS that supports Chinese, English, Japanese, and Spanish, and enables robust emotion transfer even without target-language emotional training data;</li>
+                    <li><strong>Multilingual Extension:</strong> We propose three explicit cross-lingual modeling strategies, boundary-aware alignment, token-level concatenation, and instruction-guided generation, establishing practical design principles for zero-shot multilingual emotional TTS that supports Chinese, English, Japanese, Spanish and Arabic, and enables robust emotion transfer without target-language emotional training data;</li>
                     <li><strong>Reinforcement Learning Optimization:</strong> we apply Group Relative Policy Optimization (GRPO) in post-training of the T2S module, improving pronunciation accuracy and naturalness.</li>
                 </ul>
                 Experiments show that IndexTTS 2.5 not only supports broader language coverage but also replicates emotional prosody in unseen languages under the same zero-shot setting. IndexTTS 2.5 achieves a 2.28× improvement in real-time factor (RTF) while maintaining comparable word error rate (WER) and speaker similarity to IndexTTS 2.
@@ -36,9 +36,15 @@
         <!-- contents -->
         <h2>Contents</h2>
         <ul>
-            <li><a href="#section1">1 Emotionally Expressive Speech Generation</a></li>
+            <li><a href="#section1">1 Zero-shot In-context Generation</a></li>
 
-            <li><a href="#section2">2 Zero-shot In-context Generation</a></li>
+            <li><a href="#section2">2 Emotionally Expressive Speech Generation</a></li>
+
+            <li><a href="#section3">3 Cross-lingual Generation</a></li>
+
+            <li><a href="#section4">4 Speaker and Emotion Disentangle</a></li>
+
+            <li><a href="#section5">5 Emotion Vector Control</a></li>
         </ul>
     </section>
 
@@ -46,73 +52,453 @@
 
     <!-- page 1 -->
     <section class="container" id="section1">
-        <h2>1 Emotionally Expressive Speech Generation</h2>
-
-        <h4>IndexTTS 2.5 accurately reconstructs the emotional content present in the prompt audio, demonstrating emotion replication in Japanese and Spanish—languages newly supported in this version.</h4>
+        <h2>1 Zero-shot In-context Generation</h2>
+        <h4>IndexTTS 2.5 supports zero-shot voice cloning in Chinese, English, Japanese, Spanish and Arabic, preserving speaker identity from a single reference audio. All samples use neutral prosody.</h4>
         <div class="demo-section">
             <div class="table-container">
                 <table class="zebra-table" id="section1-table">
                     <tr>
                         <th>Language</th>
+                        <th>Audio-Prompt</th>
+                        <th style="min-width:200px;" class="col-text">Text</th>
+                        <th class="col-model">Model</th>
+                        <th>Audio</th>
+                    </tr>
+
+                    <!-- ZH text1 -->
+                    <tr>
+                        <td rowspan="12">ZH</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/zh_21/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">同形观音座莲为观音座莲科观音座莲属下的一个种。</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_21/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_21/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_21/audio_fish_speech_s2_pro.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_21/audio_moss_tts_v1_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_21/audio_omnivoice.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_21/audio_voxcpm2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <!-- ZH text2 -->
+                    <tr>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/zh_312/prompt_audio_312.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">如果你愿意，请想象一个曼彻斯特人、一个波士顿人、一个牙买加人和一个悉尼人围坐在多伦多的一家餐馆里吃饭。</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_312/indextts_2_5_zh_312.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_312/cosyvoice_3_zh_312.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_312/fish_speech_s2_pro_zh_312.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_312/moss_tts_v1_5_zh_312.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_312/omnivoice_zh_312.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/zh_312/voxcpm2_zh_312.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- EN text1 -->
+                    <tr>
+                        <td rowspan="12">EN</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/en_338/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">Animal Liberation and the Royal Society for the Prevention of Cruelty to Animals (RSPCA) are again calling for the mandatory installation of CCTV cameras in all Australian abattoirs.</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_338/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_338/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_338/audio_fish_speech_s2_pro.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_338/audio_moss_tts_v1_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_338/audio_omnivoice.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_338/audio_voxcpm2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <!-- EN text2 -->
+                    <tr>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/en_457/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">The U.S. says it has received information from an undisclosed source that specifically mentions the use of suicide bombers to will blow up "prominent landmarks" in Ethiopia and Kenya.</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_457/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_457/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_457/audio_fish_speech_s2_pro.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_457/audio_moss_tts_v1_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_457/audio_omnivoice.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/en_457/audio_voxcpm2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- JA text1 -->
+                    <tr>
+                        <td rowspan="12">JA</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/ja_336/prompt_ja_336.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">このマインドセットの焦点は、スピード、論理性、正確性にあり、事実の特定、既存のテクニックの再適用、情報収集にも力を入れています。</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_336/indextts_2_5_ja_336.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_336/cosyvoice_3_ja_336.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_336/fish_speech_s2_pro_ja_336.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_336/moss_tts_v1_5_ja_336.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_336/omnivoice_ja_336.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_336/voxcpm2_ja_336.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <!-- JA text2 -->
+                    <tr>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/ja_428/prompt_audio_428.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">あるとき、恐怖に怯える王妃の前で、暴徒の1人がヴェルサイユ宮殿で殺された王室の衛兵の首を振って見せた。</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_428/indextts_2_5_ja_428.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_428/cosyvoice_3_ja_428.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_428/fish_speech_s2_pro_ja_428.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_428/moss_tts_v1_5_ja_428.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_428/omnivoice_ja_428.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ja_428/voxcpm2_ja_428.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- ES text1 -->
+                    <tr>
+                        <td rowspan="12">ES</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/es_167/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">Tras la derrota, Blanc anunció su dimisión.</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_167/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_167/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_167/audio_fish_speech_s2_pro.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_167/audio_moss_tts_v1_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_167/audio_omnivoice.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_167/audio_voxcpm2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <!-- ES text2 -->
+                    <tr>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/es_386/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">Por lo general, siempre que se mueva dentro de esta región podrá atravesar las fronteras sin pasar otra vez por un puesto de control de pasaportes.</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_386/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_386/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_386/audio_fish_speech_s2_pro.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_386/audio_moss_tts_v1_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_386/audio_omnivoice.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/es_386/audio_voxcpm2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- AR text1 -->
+                    <tr>
+                        <td rowspan="12">AR</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/ar_100/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">بل أنتم في خواتيمه في أفضل لياليه وأيامه. هذه عشره الأخيرة.</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_100/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_100/audio_fish_speech_s2_pro.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_100/audio_moss_tts_v1_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_100/audio_omnivoice.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_100/audio_voxcpm2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <!-- AR text2 -->
+                    <tr>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex1/ar_11/audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">متسائلة ماذا لو كنا رواية تحكى؟ كيف ستكون بدايتها وماذا عن نهايتها؟ تفاصيل كثيرة تجول بيننا وبين ذواتنا. تفاصيل البعض منها جميل. ونتمنى لو أننا نملك حق إعادة تلك الأوقات.</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_11/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_11/audio_fish_speech_s2_pro.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_11/audio_moss_tts_v1_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_11/audio_omnivoice.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex1/ar_11/audio_voxcpm2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- page 2 -->
+    <section class="container" id="section2">
+        <h2>2 Emotionally Expressive Speech Generation</h2>
+
+        <h4>IndexTTS 2.5 accurately replicates the emotional prosody present in the prompt audio across all supported languages. The following examples demonstrate emotion reproduction in Chinese, English, and the newly supported Japanese, Spanish, and Arabic. Note that due to the lack of Arabic emotional audio, we used Japanese audio as prompt here.</h4>
+        <div class="demo-section">
+            <div class="table-container">
+                <table class="zebra-table" id="section2-table">
+                    <tr>
+                        <th>Language</th>
                         <th>Emotion</th>
                         <th>Audio-Prompt</th>
-                        <th style="min-width:200px;">Text</th>
+                        <th style="min-width:200px;" class="col-text">Text</th>
                         <th>Audio</th>
                     </tr>
 
 <!-- TODO  mark-->
                     <tr>
-                        <td rowspan="4">JA</th>
-                        <td>Happy</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/ja/happy_audio_prompt.aac" type="audio/aac"></audio></div></td>
-                        <td>ちょうど探しに行こうかなって思っていたんだ。どうかな、一緒に練習でも。</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/ja/happy_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
-                    </tr>
-                    <tr>
-                        <td>Neutral</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/ja/neutral_audio_prompt.aac" type="audio/aac"></audio></div></td>
-                        <td>小さい頃、異邦から流れ着いた勇者が剣術修行に付き合ってくれたり、魔物を倒しながら一緒に世界を救う旅をしたり…なんてのをよく想像していたんだ。</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/ja/neutral_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
-                    </tr>
-                    <tr>
-                        <td>Guilty</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/ja/guilty_audio_prompt.aac" type="audio/aac"></audio></div></td>
-                        <td>いつ咲こうとも、風に吹き落される時は…来る。</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/ja/guilty_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="4">ZH</td>
+                        <td>Angry</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh/prompt_audio_13.aac" type="audio/aac"></audio></div></td>
+                        <td>我说，你别叨叨了行不行，你这辈子还没叨叨够哇？</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh/angry_high_uttid_13.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
                         <td>Sad</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/ja/sad_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh/prompt_audio_23.aac" type="audio/aac"></audio></div></td>
+                        <td>每次闭上眼睛，脑海里全是那些让人痛心的回忆，我忍不住流泪。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh/sad_high_uttid_23.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Happy</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh/prompt_audio_2.aac" type="audio/aac"></audio></div></td>
+                        <td>祝你十四岁快乐! 愿您的生活永远充满阳光和欢笑！</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh/happy_high_uttid_2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Neutral</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh/prompt_audio_35.aac" type="audio/aac"></audio></div></td>
+                        <td>镰叶山龙眼为山龙眼科山龙眼属下的一个种。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/zh/happy_low_uttid_35.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+<!-- TODO  mark-->
+                    <tr>
+                        <td rowspan="4">EN</td>
+                        <td>Happy</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en/prompt_audio_17.aac" type="audio/aac"></audio></div></td>
+                        <td>I was chatting with an old classmate just now, reminiscing about the silly things we did as kids. We laughed so hard, tears almost came out. I really miss those days!</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en/happy_high_uttid_17.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Sad</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en/prompt_audio_11_sad.aac" type="audio/aac"></audio></div></td>
+                        <td>I feel like I’m lost in the darkness and can’t find a way out anymore.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en/sad_high_uttid_11.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Angry</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en/prompt_audio_11.aac" type="audio/aac"></audio></div></td>
+                        <td>If you’d ever treated me like a human being, would they have dared to do this?</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en/angry_high_uttid_11.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Neutral</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en/prompt_audio_36.aac" type="audio/aac"></audio></div></td>
+                        <td>The tower caused minor discontent, because it blocked sight lines of Central Park.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/en/sad_low_uttid_36.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+<!-- TODO  mark-->
+                    <tr>
+                        <td rowspan="4">JA</td>
+                        <td>Happy</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja/happy_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>ちょうど探しに行こうかなって思っていたんだ。どうかな、一緒に練習でも。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja/happy_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Neutral</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja/neutral_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>小さい頃、異邦から流れ着いた勇者が剣術修行に付き合ってくれたり、魔物を倒しながら一緒に世界を救う旅をしたり…なんてのをよく想像していたんだ。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja/neutral_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Guilty</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja/guilty_audio_prompt.aac" type="audio/aac"></audio></div></td>
                         <td>いつ咲こうとも、風に吹き落される時は…来る。</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/ja/sad_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja/guilty_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Sad</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja/sad_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td>いつ咲こうとも、風に吹き落される時は…来る。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ja/sad_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
                     </tr>
 
 <!-- TODO  mark-->
 
                     <tr>
-                        <td rowspan="4">ES</th>
+                        <td rowspan="4">ES</td>
                         <td>Happy</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/es/happy_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es/happy_audio_prompt.aac" type="audio/aac"></audio></div></td>
                         <td>No esperaba que esto fuese tan útil. Ahora que has obtenido un ascenso. ¿Puedes mejorar mi habitación? Gracias por valorar alguien tan vulnerable como yo, Doc. Seguiré dando lo mejor de mí.</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/es/happy_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es/happy_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
                         <td>Excited</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/es/excited_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es/excited_audio_prompt.aac" type="audio/aac"></audio></div></td>
                         <td>¿Te has perdido? No te preocupes. Dime adónde quieres ir. Para llegar allí, sube a las escaleras de la izquierda del cuarto piso. Luego, gira a la derecha, y traspasa la tercera cruce, vea a la izquierda. Baja el piso, y sigue atravesar a la izquierda. Está justo enfrente de la sala de ingeniería de número tres.</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/es/excited_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es/excited_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
                         <td>Surprise</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/es/surprise_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es/surprise_audio_prompt.aac" type="audio/aac"></audio></div></td>
                         <td>No es tu dieta de hacer los bajos de tu ropa y tus zapatos están limpios. ¡Muy bien! Espera, llevas el cuello de la ropa muy arrugado. No pretenderás ir a la fiesta así, ¿no? Vuelve y arregla eso. Te espero aquí.</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/es/surprise_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es/surprise_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
                         <td>Neutral</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/es/neutral_audio_prompt.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es/neutral_audio_prompt.aac" type="audio/aac"></audio></div></td>
                         <td>Ehh, ¿me das un momento para asimilarlo? Supongo que ya es tarde para echarse atrás. Vamos allá.</td>
-                        <td><div class="demo-item"><audio controls><source src="ex1/es/neutral_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/es/neutral_audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="4">AR</td>
+                        <td>Happy</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ar/Ja_F_1_Happy.aac" type="audio/aac"></audio></div></td>
+                        <td>أنا في قمة السعادة اليوم، كل شيء يسير على ما يرام!</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ar/Ar_F_1_Happy.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Angry</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ar/Ja_M_1_Angry.aac" type="audio/aac"></audio></div></td>
+                        <td>هذا الموقف سخيف ومستفز لأقصى درجة.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ar/Ar_M_1_Angry.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Sad</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ar/Ja_F_2_Sad.aac" type="audio/aac"></audio></div></td>
+                        <td>الدموع لا تفارق عيني، أشتاق له كثيراً.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ar/Ar_F_2_Sad.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>Neutral</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ar/Ja_M_2_Neutral.aac" type="audio/aac"></audio></div></td>
+                        <td>هذه هي النسخة النهائية من الوثيقة.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex2/ar/Ar_M_2_Neutral.aac" type="audio/aac"></audio></div></td>
                     </tr>
 
                 </table>
@@ -122,108 +508,137 @@
     </section>
 
 
-    <!-- page 2 -->
-    <section class="container" id="section2">
-        <h2>2 Zero-shot In-context Generation</h2>
-        <h4>IndexTTS 2.5 supports zero-shot voice cloning in Chinese, English, Japanese, and Spanish, preserving speaker identity from a single reference audio. All samples use neutral prosody.</h4>
+
+    <!-- page 3 -->
+    <section class="container" id="section3">
+        <h2>3 Cross-lingual Generation</h2>
+        <h4>IndexTTS 2.5 supports generating speech using prompt audio from another language (we only demonstrate those using Chinese prompt audio here), while maintaining the accent and prosody of the target language.</h4>
         <div class="demo-section">
             <div class="table-container">
                 <table class="zebra-table">
                     <tr>
                         <th>Language</th>
                         <th>Audio-Prompt</th>
-                        <th style="min-width:200px;">Text</th>
-                        <th>Ground Truth</th>
-                        <th>Model</th>
+                        <th style="min-width:200px;" class="col-text">Text</th>
+                        <th class="col-model">Model</th>
                         <th>Audio</th>
                     </tr>
 
-<!-- TODO  mark-->
+                    <!-- EN -->
                     <tr>
-                        <td rowspan="4">ZH</th>
-                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_prompt.aac" type="audio/aac"></audio></div></td>
-                        <td rowspan="4">为了弄明白停水原因，他给自来水公司打电话。</td>
-                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/zh_348/gt.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">EN</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex3/en/audio_prompt_to_en_51.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">Elmore is also a lawyer, having received a law degree from Northwestern University.</td>
                         <td>IndexTTS 2.5</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
-                    </tr>
-                    <tr>
-                        <td>IndexTTS 2</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_indextts_2.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/en/indextts_2_5_to_en_51.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
                         <td>CosyVoice 3</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/en/cosyvoice_to_en_51.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
-                        <td>FireRedTTS-2</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/zh_348/audio_firered_tts_2.aac" type="audio/aac"></audio></div></td>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/en/fish_speech_s2_pro_to_en_51.aac" type="audio/aac"></audio></div></td>
                     </tr>
-<!-- TODO  mark-->
                     <tr>
-                        <td rowspan="4">EN</th>
-                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/en_338/audio_prompt.aac" type="audio/aac"></audio></div></td>
-                        <td rowspan="4">Kanwal is said to mean 'snakes indeed' in a local aboriginal language.</td>
-                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/en_338/gt.aac" type="audio/aac"></audio></div></td>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/en/moss_tts_v1_5_to_en_51.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/en/omnivoice_to_en_51.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/en/voxcpm2_to_en_51.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- JA -->
+                    <tr>
+                        <td rowspan="6">JA</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex3/ja/prompt_to_ja_106.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">傷の上を、手ぬぐいで冷やされると、ずいぶんしみたけれども、周作は我慢をした。</td>
                         <td>IndexTTS 2.5</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/en_338/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
-                    </tr>
-                    <tr>
-                        <td>IndexTTS 2</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/en_338/audio_indextts_2.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ja/indextts_2_5_to_ja_106.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
                         <td>CosyVoice 3</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/en_338/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ja/cosyvoice.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
-                        <td>FireRedTTS-2</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/en_338/audio_firered_tts_2.aac" type="audio/aac"></audio></div></td>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ja/fish_speech_s2_pro_to_ja_106.aac" type="audio/aac"></audio></div></td>
                     </tr>
-<!-- TODO  mark-->
                     <tr>
-                        <td rowspan="4">JA</th>
-                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/ja_390/audio_prompt.aac" type="audio/aac"></audio></div></td>
-                        <td rowspan="4">そのため、単にラベルとして表記が追加されがちです。</td>
-                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/ja_390/gt.aac" type="audio/aac"></audio></div></td>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ja/moss_tts_v1_5_to_ja_106.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ja/omnivoice_to_ja_106.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ja/voxcpm2_to_ja_106.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- ES -->
+                    <tr>
+                        <td rowspan="6">ES</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex3/es/audio_prompt_to_es_56.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">Los especialistas detectaron la formación de cristales en el orín de los felinos, por la incorporación de melamina y ácido cianúrico.</td>
                         <td>IndexTTS 2.5</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/ja_390/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/es/indextts_2_5_to_es_56.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
-                        <td>IndexTTS 2</td>
+                        <td>CosyVoice 3</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/es/cosyvoice.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/es/fish_speech_s2_pro_to_es_56.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/es/moss_tts_v1_5_to_es_56.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/es/omnivoice_to_es_56.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/es/voxcpm2_to_es_56.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- AR -->
+                    <tr>
+                        <td rowspan="6">AR</td>
+                        <td rowspan="6"><div class="demo-item"><audio controls><source src="ex3/ar/audio_prompt_to_ar_13.aac" type="audio/aac"></audio></div></td>
+                        <td rowspan="6">والوفاء بالعهود والصبر والإنفاق ومقابلة السيئة بالحسنة وفيها التحذير من بعض انفصال الموجبة للطعن والطرد من رحمة الله تعالى</td>
+                        <td>IndexTTS 2.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ar/indextts_2_5_to_ar_13.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>CosyVoice 3</td>
                         <td>N/A</td>
                     </tr>
                     <tr>
-                        <td>CosyVoice 3</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/ja_390/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                        <td>FishSpeech S2 Pro</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ar/fish_speech_s2_pro_to_ar_13.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
-                        <td>FireRedTTS-2</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/ja_390/audio_firered_tts_2.aac" type="audio/aac"></audio></div></td>
-                    </tr>
-<!-- TODO  mark-->
-                    <tr>
-                        <td rowspan="4">ES</th>
-                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/es_613/audio_prompt.aac" type="audio/aac"></audio></div></td>
-                        <td rowspan="4">A medida que el dominio del idioma griego fue decayendo, Occidente se distanció de sus raíces griegas tanto filosóficas como científicas.</td>
-                        <td rowspan="4"><div class="demo-item"><audio controls><source src="ex2/es_613/gt.aac" type="audio/aac"></audio></div></td>
-                        <td>IndexTTS 2.5</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/es_613/audio_indextts_2_5.aac" type="audio/aac"></audio></div></td>
+                        <td>MossTTS v1.5</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ar/moss_tts_v1_5_to_ar_13.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
-                        <td>IndexTTS 2</td>
-                        <td>N/A</td>
+                        <td>OmniVoice</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ar/omnivoice_to_ar_13.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
-                        <td>CosyVoice 3</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/es_613/audio_cosyvoice_3.aac" type="audio/aac"></audio></div></td>
+                        <td>VoxCPM2</td>
+                        <td><div class="demo-item"><audio controls><source src="ex3/ar/voxcpm2_to_ar_13.aac" type="audio/aac"></audio></div></td>
                     </tr>
-                    <tr>
-                        <td>FireRedTTS-2</td>
-                        <td><div class="demo-item"><audio controls><source src="ex2/es_613/audio_firered_tts_2.aac" type="audio/aac"></audio></div></td>
-                    </tr>
-
-
 
                 </table>
             </div>
@@ -231,11 +646,253 @@
 
     </section>
 
+    <!-- page 4 -->
+    <section class="container" id="section4">
+        <h2>4 Speaker and Emotion Disentangle</h2>
+        <h4>IndexTTS 2.5 decouples speaker identity from emotional expression, allowing users to independently specify a timbre prompt and an emotion prompt. The timbre prompt determines the speaker's voice characteristics, while the emotion prompt controls the emotional style of the generated speech. The two prompts can come from different speakers or even different languages.</h4>
+        <div class="demo-section">
+            <div class="table-container">
+                <table class="zebra-table">
+                    <tr>
+                        <th>Language</th>
+                        <th>Timbre-Prompt</th>
+                        <th>Emotion-Prompt</th>
+                        <th style="min-width:200px;" class="col-text">Text</th>
+                        <th>Audio</th>
+                    </tr>
 
+                    <tr>
+                        <td>ZH</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_01.aac" type="audio/wav"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/emo_sad.aac" type="audio/wav"></audio></div></td>
+                        <td>尾号四四九幺的乘客刚夸了你，厉害了我的师傅，你真是个活地图。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/zh_021_voice_01_sad.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>EN</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_02.aac" type="audio/wav"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/emo_low.aac" type="audio/wav"></audio></div></td>
+                        <td>Have you visited that famous bat cave, Albert?</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/en_096_voice_02_low.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>JA</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_09.aac" type="audio/wav"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/emo_surprise.aac" type="audio/wav"></audio></div></td>
+                        <td>電気について知らないのは非常識とされるようになる。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/ja_142_voice_09_surprise.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>ES</td> 
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_12.aac" type="audio/wav"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/emo_happy.aac" type="audio/wav"></audio></div></td>
+                        <td>En la actualidad se continúa utilizando con mucha frecuencia una corona abierta.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/es_004_voice_04_happy.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>AR</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_11.aac" type="audio/wav"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/emo_angry.aac" type="audio/wav"></audio></div></td>
+                        <td>فكلُّها خياراتٌ اتَّخذتَها بنفسِك، كشخصٍ بالغٍ يتحمّلُ مسؤوليّتَه كاملةً.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/ar_164_voice_11_angry.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- page 5 -->
+    <section class="container" id="section5">
+        <h2>5 Emotion Vector Control</h2>
+        <h4>IndexTTS 2.5 supports controlling emotion intensity through an emotion weight parameter, allowing fine-grained control over the expressiveness of generated speech.</h4>
+        <div class="demo-section">
+            <div class="table-container">
+                <table class="zebra-table">
+                    <tr>
+                        <th>Language</th>
+                        <th>Audio-Prompt</th>
+                        <th>Emotion Category</th>
+                        <th>Emotion Weight</th>
+                        <th style="min-width:200px;" class="col-text">Text</th>
+                        <th>Audio</th>
+                    </tr>
+
+                    <!-- ZH -->
+                    <tr>
+                        <td rowspan="6">ZH</td>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_03.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Calm</td>
+                        <td>0.5</td>
+                        <td rowspan="3">有些人走了就再也没有回来过，所以等待和犹豫是这个世界上最无情的杀手。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/zh/zh_voice_03_calm_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/zh/zh_voice_03_calm_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/zh/zh_voice_03_calm_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_04.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Angry</td>
+                        <td>0.5</td>
+                        <td rowspan="3">我站在人海中，却感觉比任何时候都要孤独。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/zh/zh_voice_04_angry_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/zh/zh_voice_04_angry_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/zh/zh_voice_04_angry_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- EN -->
+                    <tr>
+                        <td rowspan="6">EN</td>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_02.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Disgusted</td>
+                        <td>0.5</td>
+                        <td rowspan="3">Have you visited that famous bat cave, Albert?</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/en/en_voice_02_disgusted_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/en/en_voice_02_disgusted_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/en/en_voice_02_disgusted_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_12.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Happy</td>
+                        <td>0.5</td>
+                        <td rowspan="3">He decided to spend the night there.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/en/en_voice_12_happy_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/en/en_voice_12_happy_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/en/en_voice_12_happy_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- JA -->
+                    <tr>
+                        <td rowspan="6">JA</td>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_12.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Happy</td>
+                        <td>0.5</td>
+                        <td rowspan="3">翻訳ツールのおかげで外国のサイトもよく見るようになった。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ja/ja_voice_12_happy_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ja/ja_voice_12_happy_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ja/ja_voice_12_happy_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_12.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Angry</td>
+                        <td>0.5</td>
+                        <td rowspan="3">翻訳ツールのおかげで外国のサイトもよく見るようになった。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ja/ja_voice_12_angry_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ja/ja_voice_12_angry_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ja/ja_voice_12_angry_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- ES -->
+                    <tr>
+                        <td rowspan="6">ES</td>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_08.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Melancholic</td>
+                        <td>0.5</td>
+                        <td rowspan="3">En la actualidad se continúa utilizando con mucha frecuencia una corona abierta.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/es/es_voice_08_melancholic_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/es/es_voice_08_melancholic_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/es/es_voice_08_melancholic_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_12.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Angry</td>
+                        <td>0.5</td>
+                        <td rowspan="3">Los esfuerzos policiales para encontrarla no arrojaron ningún resultado.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/es/es_voice_12_angry_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/es/es_voice_12_angry_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/es/es_voice_12_angry_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                    <!-- AR -->
+                    <tr>
+                        <td rowspan="6">AR</td>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_07.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Happy</td>
+                        <td>0.5</td>
+                        <td rowspan="3">فكلُّها خياراتٌ اتَّخذتَها بنفسِك، كشخصٍ بالغٍ يتحمّلُ مسؤوليّتَه كاملةً</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ar/ar_voice_07_happy_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ar/ar_voice_07_happy_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ar/ar_voice_07_happy_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><div class="demo-item"><audio controls><source src="ex4/voice_02.aac" type="audio/wav"></audio></div></td>
+                        <td rowspan="3">Melancholic</td>
+                        <td>0.5</td>
+                        <td rowspan="3">الطقس جميل اليوم، هيا نخرج ونستمتع!</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ar/ar_voice_02_melancholic_0.5.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ar/ar_voice_02_melancholic_0.8.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td><div class="demo-item"><audio controls><source src="ex5/ar/ar_voice_02_melancholic_1.0.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+
+    </section>
 
     <!-- Footer -->
     <div class="footer">
-        <p>© 2025 May, Index SpeechTeam. All rights reserved.</p>
+        <p>© 2026 July, Index SpeechTeam. All rights reserved.</p>
     </div>
 
     <script>
