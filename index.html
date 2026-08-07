@@ -9,7 +9,7 @@
     <script defer src="https://cloud.umami.is/script.js" data-website-id="cb987c55-28cc-450b-adee-a200240623f6"></script>
 </head>
 <body>
-
+    
     <!-- Page 0 -->
     <section class="container" id="section0">
         <h1>IndexTTS 2.5 Technical Report</h1>
@@ -32,6 +32,44 @@
             </p>
         </section>
 
+        <!-- video demos -->
+        <section class="video-section">
+            <div class="video-grid">
+                <!-- 1st video -->
+                <div class="video-card">
+                    <video class="intro-video" controls poster="ex7/JA_cover.jpg">
+                        <source src="ex7/JA.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-caption">
+                        <div class="caption-text">IndexTTS2.5: Controllable Emotional Speech Generation for Audiovisual Dubbing – A Case Study on Iconic Scenes from The Mermaid</div>
+                    </div>
+                </div>
+
+                <!-- 2nd video -->
+                <div class="video-card">
+                    <video class="intro-video" controls poster="ex7/es_cover.jpg">
+                        <source src="ex7/es.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-caption">
+                        <div class="caption-text">IndexTTS2.5: Controllable Emotional Speech Generation for Audiovisual Dubbing – A Case Study on Iconic Scenes from Infernal Affairs</div>
+                    </div>
+                </div>
+
+                <!-- 3rd video -->
+                <div class="video-card">
+                    <video class="intro-video" controls poster="ex7/ar_cover.jpg">
+                        <source src="ex7/ar.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-caption">
+                        <div class="caption-text">IndexTTS2.5: Controllable Emotional Speech Generation for Audiovisual Dubbing – A Case Study on Iconic Scenes from Pegasus</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
 
         <!-- contents -->
         <h2>Contents</h2>
@@ -45,6 +83,8 @@
             <li><a href="#section4">4 Speaker and Emotion Disentangle</a></li>
 
             <li><a href="#section5">5 Emotion Vector Control</a></li>
+
+            <li><a href="#section6">6 Grapheme-to-Phoneme (G2P) Control</a></li>
         </ul>
     </section>
 
@@ -684,10 +724,10 @@
                     </tr>
                     <tr>
                         <td>ES</td> 
-                        <td><div class="demo-item"><audio controls><source src="ex4/voice_12.aac" type="audio/wav"></audio></div></td>
-                        <td><div class="demo-item"><audio controls><source src="ex4/emo_happy.aac" type="audio/wav"></audio></div></td>
-                        <td>En la actualidad se continúa utilizando con mucha frecuencia una corona abierta.</td>
-                        <td><div class="demo-item"><audio controls><source src="ex4/es_004_voice_04_happy.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_04.aac" type="audio/wav"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/emo_angry.aac" type="audio/wav"></audio></div></td>
+                        <td>Esto se consigue eliminando información redundante.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/es_108_voice_04_angry_0.8.aac" type="audio/aac"></audio></div></td>
                     </tr>
                     <tr>
                         <td>AR</td>
@@ -890,6 +930,69 @@
 
     </section>
 
+    <!-- page 6 -->
+    <section class="container" id="section6">
+        <h2>6 Grapheme-to-Phoneme (G2P) Control</h2>
+        <h4>IndexTTS 2.5 provides fine-grained pronunciation control via language-specific Grapheme-to-Phoneme (G2P) interfaces: Pinyin for Chinese, the CMU Pronouncing Dictionary for English, and Kana for Japanese. This enables precise disambiguation of polyphones and accurate rendering of context-dependent pronunciations.</h4>
+        <div class="demo-section">
+            <div class="table-container">
+                <table class="zebra-table">
+                    <tr>
+                        <th>Language</th>
+                        <th>Prompt</th>
+                        <th style="min-width:200px;" class="col-text">Text</th>
+                        <th>With G2P</th>
+                        <th>Without G2P</th>
+                    </tr>
+
+                    <tr>
+                        <td>ZH</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_03.aac" type="audio/wav"></audio></div></td>
+                        <td>他在银&lt;行|XING2&gt;里&lt;行|HANG2&gt;走了半天，发现这笔业务办不&lt;行|HANG2&gt;。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/zh_g2p.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/zh_wo_g2p.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>ZH</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_04.aac" type="audio/wav"></audio></div></td>
+                        <td>认为反孔并非&lt;掊|POU3&gt;击孔子思想本身，乃&lt;掊|POU3&gt;击专制政治之灵魂</td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/zh_g2p_1.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/zh_wo_g2p_1.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>ZH</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_07.aac" type="audio/wav"></audio></div></td>
+                        <td>只见会计&lt;长|ZHANG3&gt;正着急地数着单据：“这次出差差不多花了万把块，我得好好核对！“</td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/zh_g2p_2.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/zh_wo_g2p_2.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>EN</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_06.aac" type="audio/wav"></audio></div></td>
+                        <td>He had a &lt;minute|M IH1 . N AH0 T&gt; to examine the &lt;minute|M AY0 . N UW1 T&gt; details of the contract.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/en_g2p.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/en_wo_g2p.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>EN</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_07.aac" type="audio/wav"></audio></div></td>
+                        <td>&lt;Bilibili|B IY1 . L IY1 . B IY1 . L IY1&gt; is one of China's most popular video platforms.</td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/en_g2p_1.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/en_wo_g2p_1.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+                    <tr>
+                        <td>JA</td>
+                        <td><div class="demo-item"><audio controls><source src="ex4/voice_09.aac" type="audio/wav"></audio></div></td>
+                        <td>彼は料理が&lt;上手|じょうず&gt;だが、囲碁では&lt;上手|うわて&gt;に負けた。</td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/ja_g2p.aac" type="audio/aac"></audio></div></td>
+                        <td><div class="demo-item"><audio controls><source src="ex6/ja_wo_g2p.aac" type="audio/aac"></audio></div></td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+
+    </section>
     <!-- Footer -->
     <div class="footer">
         <p>© 2026 July, Index SpeechTeam. All rights reserved.</p>
